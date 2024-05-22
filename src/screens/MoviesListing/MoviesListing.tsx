@@ -1,48 +1,82 @@
 import axios from "axios";
-import { FC, useEffect, useState } from "react";
-import { Button, FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { FC, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Button, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import  Movie  from "../../models/Movie";
 
-const apiKey = '38e4a7fa63dea0b2c5c9dc5ce87d503d';
+
+// CONSTANTS
+const API_KEY = '38e4a7fa63dea0b2c5c9dc5ce87d503d';
+const BASE_URL = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`
 
 const MoviesListing: FC = ({ navigation }) => {
 
+  // STATES
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // METHODS
+  useEffect(() => {
+    fetchMovies();
+  }, [currentPage]);
 
   function handlePressedMovie(movieDetails: Movie) {
     navigation.navigate('Movie Details', { movieDetails });
   }
 
-  useEffect(() => {
-    async function fetchMovies() {
+  async function fetchMovies() {
       try {
-        setIsLoading(true);
-        const response = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`);
+        // setIsLoading(true);
+        const response = await axios.get(`${BASE_URL}&page=${currentPage}`);
         if(response) {
-          setMovies(response.data.results);
-          console.log(response.data.results);
+          setMovies([...movies, ...response.data.results]);
         }
       } catch (error) {
         console.error(error);
         throw new Error('Error fetching movies');
       }
       setIsLoading(false);
-    }
+  }
 
-    fetchMovies();
-  }, []);
+  async function onRefresh() {
+    setIsRefreshing(true);
+    setMovies([]); // Clear the movies
+    setCurrentPage(1); // Reset the page number
+    await fetchMovies(); // Fetch the movies again
+    setIsRefreshing(false);
+  }
+
+
+  function renderLoader() {
+    return (
+      <View style={{ padding: 10 }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  async function loadMoreIems() {
+    setCurrentPage(currentPage + 1);
+    await fetchMovies();
+  }
 
 
   return (
     <View style={styles.container}>
-      <Text>Movies Listing</Text>
-      { isLoading && <Text>Loading...</Text> }
+      <Text style={styles.header}>Movies Listing</Text>
+
+      { isLoading && renderLoader()}
 
       { !isLoading && 
-      
       <FlatList
         data={movies}
+        onEndReached={loadMoreIems}
+        onEndReachedThreshold={0.5}
+        refreshing={isRefreshing}
+        onRefresh={onRefresh}
+        ListFooterComponent={renderLoader}
+
         renderItem={({ item }) => (
           <Pressable
             onPress={() => handlePressedMovie(item)}>
@@ -60,7 +94,7 @@ const MoviesListing: FC = ({ navigation }) => {
             </View>
           </Pressable>
         )}
-        keyExtractor={(item) => item?.id.toString()}></FlatList>}
+        keyExtractor={(item) => (item?.id + Math.random()).toString()}></FlatList>}
     </View>
   );
 }
@@ -74,6 +108,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10
+  }
 });
 
 
