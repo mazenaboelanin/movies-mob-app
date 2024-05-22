@@ -17,6 +17,7 @@ const MoviesListing: FC = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // METHODS
   useEffect(() => {
@@ -34,10 +35,13 @@ const MoviesListing: FC = ({ navigation }) => {
         const parsedResponse = JSON.parse(response);
         setMovies([...movies, ...parsedResponse.results]);
         setMaxPages(parsedResponse.total_pages);
+        setError(null);
+      } else {
+        setError('No Data Found');
       }
     } catch (error) {
       console.log('Error fetching movies', error);
-      // throw new Error('Error fetching movies');
+      setError('Error fetching movies');
     }
     setIsLoading(false);
   }
@@ -74,14 +78,26 @@ const MoviesListing: FC = ({ navigation }) => {
     await fetchMovies();
   }
 
+  function renderError() {
+    return (
+      <View>
+        <Text>
+          { error }
+        </Text>
+      </View> 
+    );
+  }
+
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Movies Listing</Text>
 
-      { isLoading && renderLoader()}
+      { error && !isLoading && renderError()}
 
-      { !isLoading && 
+      { isLoading && !error && renderLoader()}
+
+      { !isLoading && !error &&
       <FlatList
         data={movies}
         onEndReached={loadMoreIems}
