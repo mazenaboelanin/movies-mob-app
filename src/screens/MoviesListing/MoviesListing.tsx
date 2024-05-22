@@ -1,12 +1,14 @@
-import axios from "axios";
-import { FC, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Button, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FC, useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import  Movie  from "../../models/Movie";
+import {NativeModules} from 'react-native';
+const { NetworkModule } = NativeModules;
 
 
 // CONSTANTS
 const API_KEY = '38e4a7fa63dea0b2c5c9dc5ce87d503d';
 const BASE_URL = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`
+let MAX_PAGES = 0;
 
 const MoviesListing: FC = ({ navigation }) => {
 
@@ -26,18 +28,26 @@ const MoviesListing: FC = ({ navigation }) => {
   }
 
   async function fetchMovies() {
-      try {
-        // setIsLoading(true);
-        const response = await axios.get(`${BASE_URL}&page=${currentPage}`);
-        if(response) {
-          setMovies([...movies, ...response.data.results]);
-        }
-      } catch (error) {
-        console.error(error);
-        throw new Error('Error fetching movies');
+    try {
+      const response = await NetworkModule.fetchData(`${BASE_URL}&page=${currentPage}`);
+      if(response) {
+        const parsedResponse = JSON.parse(response);
+        setMovies([...movies, ...parsedResponse.results]);
+        setMaxPages(parsedResponse.total_pages);
       }
-      setIsLoading(false);
+    } catch (error) {
+      console.log('Error fetching movies', error);
+      // throw new Error('Error fetching movies');
+    }
+    setIsLoading(false);
   }
+
+  function setMaxPages(maxPages: number){
+    if (!MAX_PAGES) {
+      MAX_PAGES = maxPages;
+    }
+
+  };
 
   async function onRefresh() {
     setIsRefreshing(true);
@@ -57,6 +67,9 @@ const MoviesListing: FC = ({ navigation }) => {
   }
 
   async function loadMoreIems() {
+    if(currentPage >= MAX_PAGES) {
+      return;
+    }
     setCurrentPage(currentPage + 1);
     await fetchMovies();
   }
