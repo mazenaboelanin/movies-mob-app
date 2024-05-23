@@ -91,7 +91,7 @@ const MoviesListing: FC = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Movies Listing</Text>
+      {/* <Text style={styles.header}>MoviesForYou</Text> */}
 
       { error && !isLoading && renderError()}
 
@@ -108,19 +108,30 @@ const MoviesListing: FC = ({ navigation }) => {
 
         renderItem={({ item }) => (
           <Pressable
+            style={styles.pressableContainer}
             onPress={() => handlePressedMovie(item)}>
-            <View>
-              <Text>{item?.title}</Text>
+
+            <View style={styles.imageContainer}>
+              <Image 
+                source={{ uri: `https://image.tmdb.org/t/p/w500${item?.poster_path}` }}
+                style={styles.image} 
+              />
             </View>
-            <View>
-              <Image source={{ uri: `https://image.tmdb.org/t/p/w500${item?.poster_path}` }} style={{ width: 100, height: 100 }} />
+
+
+          <View style={styles.detailContainer}>
+            <View style={ styles.marginBottom }>
+              <Text style={ styles.title}>{item?.title}</Text>
             </View>
-            <View>
-              <Text>{item?.release_date}</Text>
+            <View style={ styles.marginBottom }>
+              <Text style={{color: '#CCC'}}>Release Date: {item?.release_date}</Text>
             </View>
-            <View>
-              <Text>{item?.vote_average}</Text>
+            <View style={ 
+              [styles.marginBottom, parseFloat(item?.vote_average.toFixed(1)) > 7 ? styles.rateGreenContainer : styles.rateRedContainer] }>
+              <Text style={styles.rate}>Rate: {item?.vote_average.toFixed(1)}</Text>
             </View>
+          </View>
+
           </Pressable>
         )}
         keyExtractor={(item) => (item?.id + Math.random()).toString()}></FlatList>}
@@ -133,15 +144,65 @@ const MoviesListing: FC = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#0f0e0e',
     alignItems: 'center',
     justifyContent: 'center',
   },
-
+  pressableContainer: {
+    margin: 10,
+    flexDirection: 'row',
+    marginBottom: 10,
+    backgroundColor: '#161515',
+    borderRadius: 10,
+  },
+  imageContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 100,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderBottomLeftRadius: 10,
+    borderTopLeftRadius: 10,
+  },
+  detailContainer: {
+    marginHorizontal: 10,
+    marginVertical: 5,
+  },
+  marginBottom: {
+    marginBottom: 10,
+  },
+  title: {
+    fontWeight: 'bold',
+    flexWrap: 'wrap',
+    flexShrink: 1,
+    color: '#fff',
+  },
+  rateGreenContainer: {
+    backgroundColor: 'darkgreen',
+    borderRadius: 5,
+    padding: 3,
+    width: 70,
+    alignItems: 'center',
+  },
+  rateRedContainer: {
+    backgroundColor: 'darkred',
+    borderRadius: 5,
+    padding: 3,
+    width: 70,
+    alignItems: 'center',
+  },
+  rate: {
+    fontWeight: 'bold',
+    color: '#CCC',
+  },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10
+    marginBottom: 10,
+    marginTop: 10,
+    color: '#fff',
   }
 });
 
