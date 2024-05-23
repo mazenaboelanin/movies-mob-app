@@ -18,7 +18,15 @@ native module.
 
 ### Movies Listing Page
 
-![alt movie-listing-page](./screenshots/movie-listing-page.jpg)
+<div>
+  <img src="./screenshots/movie-listing-page.jpg" width="200">
+</div>
+
+### Movie Detail Page
+
+  <img src="./screenshots/movie-details-page1.jpg" width="200">
+  <img src="./screenshots/movie-details-page2.jpg" width="200">
+  <img src="./screenshots/movie-details-page3.jpg" width="200">
 
 
 ## Installation
