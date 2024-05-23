@@ -37,10 +37,13 @@ export default function App() {
           initialRouteName="Movies" 
           screenOptions={{
             headerTintColor: 'white',
-            headerStyle: { backgroundColor: '#1976D2' },
+            headerStyle: { backgroundColor: '#161515' },
           }}
           >
-          <Stack.Screen name="Movies" component={MoviesListing} />
+          <Stack.Screen 
+            options={{ title: 'MoviesForYou' }} 
+            name="Movies" 
+            component={MoviesListing} />
           <Stack.Screen name="Movie Details" component={MovieDetails} />
         </Stack.Navigator>
       </NavigationContainer>
