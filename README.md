@@ -24,9 +24,11 @@ native module.
 
 ### Movie Detail Page
 
+<div style="display: flex">
   <img src="./screenshots/movie-details-page1.jpg" width="200">
   <img src="./screenshots/movie-details-page2.jpg" width="200">
   <img src="./screenshots/movie-details-page3.jpg" width="200">
+</div>
 
 
 ## Installation
