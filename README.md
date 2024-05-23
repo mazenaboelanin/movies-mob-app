@@ -14,6 +14,13 @@ native module.
 - App detects if no internet connection and asks user to reconnect
 
 
+## App Screenshots
+
+### Movies Listing Page
+
+![alt movie-listing-page](./screenshots/movie-listing-page.jpg)
+
+
 ## Installation
 
 Before you can run this project, you must have Node.js, npm, and React Native CLI or Expo CLI installed on your machine.
